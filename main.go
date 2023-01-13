@@ -3,6 +3,7 @@ package main
 import (
    "fmt"
    "net/http"
+   "io"
 
    "github.com/prometheus/client_golang/prometheus"
    "github.com/prometheus/client_golang/prometheus/promhttp"
@@ -32,12 +33,22 @@ func alert(w http.ResponseWriter, req *http.Request) {
    fmt.Fprintf(w, "alert inc()")
 }
 
+func pprint(w http.ResponseWriter, req *http.Request) {
+   b, err := io.ReadAll(req.Body)
+   if err != nil {
+       panic(err)
+   }
+
+   fmt.Printf("%s", b)
+}
+
 func main() {
    prometheus.MustRegister(pingCounter)
    prometheus.MustRegister(alertCounter)
 
    http.HandleFunc("/ping", ping)
    http.HandleFunc("/alert", alert)
+   http.HandleFunc("/print", pprint)
    http.Handle("/metrics", promhttp.Handler())
    http.ListenAndServe(":8090", nil)
 }
