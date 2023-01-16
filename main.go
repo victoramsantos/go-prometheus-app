@@ -19,18 +19,26 @@ var pingCounter = prometheus.NewCounter(
 func ping(w http.ResponseWriter, req *http.Request) {
    pingCounter.Inc()
    fmt.Fprintf(w, "pong")
+   fmt.Println("pong")
 }
 
-var alertCounter = prometheus.NewCounter(
-   prometheus.CounterOpts{
+var alertGauge = prometheus.NewGauge(
+   prometheus.GaugeOpts{
        Name: "alert_counter",
        Help: "Should alert something",
    },
 )
 
 func alert(w http.ResponseWriter, req *http.Request) {
-   alertCounter.Inc()
+   alertGauge.Inc()
    fmt.Fprintf(w, "alert inc()")
+   fmt.Println("alert inc()")
+}
+
+func resetAlert(w http.ResponseWriter, req *http.Request) {
+   alertGauge.Set(0)
+   fmt.Fprintf(w, "alert reset")
+   fmt.Println("alert reset")
 }
 
 func pprint(w http.ResponseWriter, req *http.Request) {
@@ -38,17 +46,25 @@ func pprint(w http.ResponseWriter, req *http.Request) {
    if err != nil {
        panic(err)
    }
+   fmt.Fprintf(w, "%s", b)
+   fmt.Println(fmt.Sprintf("%s", b))
+}
 
-   fmt.Printf("%s", b)
+func version(w http.ResponseWriter, req *http.Request) {
+  version := "1.0.3"
+  fmt.Fprintf(w, "%s", version)
+  fmt.Println(version)
 }
 
 func main() {
    prometheus.MustRegister(pingCounter)
-   prometheus.MustRegister(alertCounter)
+   prometheus.MustRegister(alertGauge)
 
    http.HandleFunc("/ping", ping)
    http.HandleFunc("/alert", alert)
+   http.HandleFunc("/resetalert", resetAlert)
    http.HandleFunc("/print", pprint)
+   http.HandleFunc("/version", version)
    http.Handle("/metrics", promhttp.Handler())
    http.ListenAndServe(":8090", nil)
 }
