@@ -94,7 +94,12 @@ func initHandlers() {
 	http.HandleFunc("/resetalert", resetAlert)
 	http.HandleFunc("/print", pprint)
 	http.HandleFunc("/version", version)
-	http.Handle("/metrics", metricsHandle())
+
+	metrics_path := os.Getenv("METRICS_PATH")
+	if port == "" {
+		port = "/metrics"
+	}
+	http.Handle(metrics_path, metricsHandle())
 }
 
 func main() {
