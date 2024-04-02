@@ -96,8 +96,8 @@ func initHandlers() {
 	http.HandleFunc("/version", version)
 
 	metrics_path := os.Getenv("METRICS_PATH")
-	if port == "" {
-		port = "/metrics"
+	if metrics_path == "" {
+		metrics_path = "/metrics"
 	}
 	http.Handle(metrics_path, metricsHandle())
 }
