@@ -24,3 +24,7 @@ Will return the version of this app. Should be equal to its docker image.
 ### /print
 
 Will print the content of body. Used to be a webhook for [Alertmanager](https://prometheus.io/docs/alerting/latest/alertmanager/).
+
+### /histogram
+
+Will randomly sleep for 0 to 5 seconds and put it in a histogram with a label `id` between 0 and 4.
